@@ -39,5 +39,5 @@ manga_queries = {
             """,
             'variables':
                 {'id': -1}
-        }
+        },
 }

@@ -41,5 +41,41 @@ anime_queries = {
             """,
             'variables':
                 {'id': -1}
+        },
+    'anime_by_title':
+        {
+            'query': """
+            query ($search: String) {
+                Media (search: $search, type: ANIME) {
+                    id
+                    title {
+                        romaji
+                        english
+                        native
+                    }
+                    coverImage {
+                        large
+                    }
+                    averageScore
+                    popularity
+                    startDate {
+                        year
+                        month
+                    }
+                    endDate {
+                        year
+                        month
+                    }
+                    season
+                    seasonYear
+                    episodes
+                    duration
+                    status
+                }
+            }
+            """,
+            'variables':
+                {'search': ""}
         }
+
 }
