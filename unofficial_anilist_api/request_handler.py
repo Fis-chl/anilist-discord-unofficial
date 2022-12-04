@@ -6,6 +6,9 @@ File Description: Contains all objects related to the AniList API.
 """
 import aiohttp
 
+from unofficial_anilist_api.query.anime_query import anime_queries
+from unofficial_anilist_api.query.manga_query import manga_queries
+
 
 class AniListRequestHandler:
     """
@@ -31,40 +34,18 @@ class AniListRequestHandler:
             async with self.session.post(self.base_url, json={'query': query, 'variables': variables}) as response:
                 return await response.json()
 
-    async def anime_by_id_query(self, anime_id):
-        query = """
-        query ($id: Int) {
-            Media (id: $id, type: ANIME) {
-                id
-                title {
-                    romaji
-                    english
-                    native
-                }
-                coverImage {
-                    large
-                }
-                averageScore
-                popularity
-                startDate {
-                    year
-                    month
-                }
-                endDate {
-                    year
-                    month
-                }
-                season
-                seasonYear
-                episodes
-                duration
-            }
-        }
-        """
+    async def anime_by_id(self, anime_id=1):
+        query = anime_queries['anime_by_id']['query']
+        variables = anime_queries['anime_by_id']['variables']
+        variables['id'] = anime_id
 
-        variables = {
-            'id': anime_id
-        }
+        json_data = await self.post_request(query=query, variables=variables)
+        return json_data['data']['Media']
+
+    async def manga_by_id(self, manga_id=1):
+        query = manga_queries['manga_by_id']['query']
+        variables = manga_queries['manga_by_id']['variables']
+        variables['id'] = manga_id
 
         json_data = await self.post_request(query=query, variables=variables)
         return json_data['data']['Media']
