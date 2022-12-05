@@ -13,7 +13,6 @@ from dotenv import load_dotenv
 from unofficial_anilist_api.request_handler import AniListRequestHandler
 from unofficial_anilist_api.bot.embeds import EmbedHandler
 
-
 # Load .env file
 load_dotenv()
 
@@ -23,9 +22,9 @@ intents.messages = True
 bot = dbot.Bot(command_prefix="-", intents=intents)
 
 
+# Functions not tagged with @bot
 async def valid_data(data):
-    return not 'errors' in data
-
+    return 'errors' not in data
 
 
 # Functions tagged with @bot
@@ -36,6 +35,8 @@ async def on_ready():
     print(f'Logged in as {bot.user}')
 
 
+# Commands
+# Anime-related commands
 @bot.command()
 async def get_anime(ctx, arg):
     data = await anilist.anime_by_id(anime_id=arg)
@@ -52,12 +53,23 @@ async def search_anime(ctx, arg):
         await send_message(ctx.channel, embed=embed)
 
 
+# Manga-related commands
 @bot.command()
 async def get_manga(ctx, arg):
     data = await anilist.manga_by_id(manga_id=arg)
     if await valid_data(data):
         embed = await embeds.manga_embed(data)
         await send_message(ctx.channel, embed=embed)
+
+
+@bot.command()
+async def search_manga(ctx, arg):
+    data = await anilist.manga_by_title(manga_title=arg)
+    if await valid_data(data):
+        embed = await embeds.manga_embed(data)
+        await send_message(ctx.channel, embed=embed)
+
+# End Commands
 
 
 async def send_message(channel, **kwargs):
@@ -78,4 +90,3 @@ embeds = EmbedHandler(None)
 # Run the bot
 bot.run(os.getenv('BOT_TOKEN'))
 # Update the avatar_url
-

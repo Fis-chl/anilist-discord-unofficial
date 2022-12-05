@@ -40,4 +40,37 @@ manga_queries = {
             'variables':
                 {'id': -1}
         },
+    'manga_by_title':
+        {
+            'query': """
+        query ($search: String) {
+            Media (search: $search, type: MANGA) {
+                id
+                title {
+                    romaji
+                    english
+                    native
+                }
+                coverImage {
+                    large
+                }
+                averageScore
+                popularity
+                startDate {
+                    year
+                    month
+                }
+                endDate {
+                    year
+                    month
+                }
+                chapters
+                volumes
+                status
+            }
+        }
+        """,
+            'variables':
+                {'search': ""}
+        }
 }
