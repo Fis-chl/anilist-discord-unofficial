@@ -23,7 +23,7 @@ class EmbedHandler:
             data['averageScore'] = "NA"
         emb.add_field(
             name="Scores and Popularity",
-            value=f"On {data['popularity']} user's lists\nAverage Score of {data['averageScore']}/100",
+            value=f"On **{data['popularity']}** user's lists\nAverage Score of **{data['averageScore']}/100**",
             inline=False
         )
         if data['status'] == "RELEASING":
@@ -56,7 +56,7 @@ class EmbedHandler:
         )
         emb.add_field(
             name="Scores and Popularity",
-            value=f"On {data['popularity']} user's lists\nAverage Score of {data['averageScore']}/100",
+            value=f"On **{data['popularity']}** user's lists\nAverage Score of **{data['averageScore']}/100**",
             inline=False
         )
         if data['status'] == "RELEASING":
@@ -78,5 +78,32 @@ class EmbedHandler:
             inline=False
         )
         emb.set_image(url=data['coverImage']['large'])
+        emb.set_footer(text="AniList Unofficial", icon_url=self.avatar_url)
+        return emb
+
+    async def user_embed(self, data):
+        emb = discord.embeds.Embed(
+            title=data['name'],
+            description=f"{data['about']}",
+            colour=0xFFAA55
+        )
+        # Do anime
+        anime = data['statistics']['anime']
+        days_watched = anime['minutesWatched'] / (60 * 24)
+        emb.add_field(
+            name="Anime Statistics",
+            value=f"Anime watched: **{anime['count']}**\n Average score: **{anime['meanScore']}/100**\n"
+                  f"Episodes watched: **{anime['episodesWatched']}**\nTotal watch time: **{days_watched:.1f}** days",
+            inline=False
+        )
+        # Do manga
+        manga = data['statistics']['manga']
+        emb.add_field(
+            name="Manga Statistics",
+            value=f"Manga read: **{manga['count']}**\n Average score: **{manga['meanScore']}/100**\n"
+                  f"Volumes read: **{manga['volumesRead']}**\nChapters read: **{manga['chaptersRead']}**",
+            inline=False
+        )
+        emb.set_thumbnail(url=data['avatar']['large'])
         emb.set_footer(text="AniList Unofficial", icon_url=self.avatar_url)
         return emb
