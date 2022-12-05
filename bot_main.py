@@ -11,7 +11,7 @@ import os
 from discord.ext.commands import bot as dbot
 from dotenv import load_dotenv
 from unofficial_anilist_api.request_handler import AniListRequestHandler
-from unofficial_anilist_api.bot.embeds import EmbedHandler
+from bot.embeds import EmbedHandler
 
 # Load .env file
 load_dotenv()
@@ -67,6 +67,15 @@ async def search_manga(ctx, arg):
     data = await anilist.manga_by_title(manga_title=arg)
     if await valid_data(data):
         embed = await embeds.manga_embed(data)
+        await send_message(ctx.channel, embed=embed)
+
+
+# User-related commands
+@bot.command()
+async def search_user(ctx, arg):
+    data = await anilist.user_by_name(username=arg)
+    if await valid_data(data):
+        embed = await embeds.user_embed(data)
         await send_message(ctx.channel, embed=embed)
 
 # End Commands
