@@ -59,3 +59,12 @@ class AniListRequestHandler:
 
         json_data = await self.post_request(query=query, variables=variables)
         return json_data['data']['Media']
+
+    async def manga_by_title(self, manga_title="86 - Eighty Six"):
+        query = manga_queries['manga_by_title']['query']
+        variables = manga_queries['manga_by_title']['variables']
+        variables['search'] = manga_title
+
+        json_data = await self.post_request(query=query, variables=variables)
+        return json_data['data']['Media']
+
