@@ -34,6 +34,7 @@ class AniListRequestHandler:
             async with self.session.post(self.base_url, json={'query': query, 'variables': variables}) as response:
                 return await response.json()
 
+    # Anime search methods
     async def anime_by_id(self, anime_id=1):
         query = anime_queries['anime_by_id']['query']
         variables = anime_queries['anime_by_id']['variables']
@@ -42,6 +43,15 @@ class AniListRequestHandler:
         json_data = await self.post_request(query=query, variables=variables)
         return json_data['data']['Media']
 
+    async def anime_by_title(self, anime_title="Cowboy Bebop"):
+        query = anime_queries['anime_by_title']['query']
+        variables = anime_queries['anime_by_title']['variables']
+        variables['search'] = anime_title
+
+        json_data = await self.post_request(query=query, variables=variables)
+        return json_data['data']['Media']
+
+    # Manga search methods
     async def manga_by_id(self, manga_id=1):
         query = manga_queries['manga_by_id']['query']
         variables = manga_queries['manga_by_id']['variables']
