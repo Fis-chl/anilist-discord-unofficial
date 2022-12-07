@@ -9,6 +9,7 @@ import aiohttp
 from unofficial_anilist_api.query.anime_query import anime_queries
 from unofficial_anilist_api.query.manga_query import manga_queries
 from unofficial_anilist_api.query.user_query import user_queries
+from unofficial_anilist_api.query.medialist_query import medialist_queries
 
 
 class AniListRequestHandler:
@@ -18,10 +19,11 @@ class AniListRequestHandler:
     NOTE: create_session() must be called before requests can be made, and close_session() should be called when the
     bot is shutting down.
     """
-    def __init__(self):
+    def __init__(self, user_list_handler):
         self.base_url = "https://graphql.anilist.co"
         self.session = None
         self.ready = False
+        self.user_list_handler = user_list_handler
 
     async def create_session(self):
         self.session = aiohttp.ClientSession()
@@ -50,6 +52,7 @@ class AniListRequestHandler:
         variables['search'] = anime_title
 
         json_data = await self.post_request(query=query, variables=variables)
+        print(json_data)
         return json_data['data']['Media']
 
     # Manga methods
@@ -76,5 +79,16 @@ class AniListRequestHandler:
         variables['search'] = username
 
         json_data = await self.post_request(query=query, variables=variables)
-        print(json_data)
         return json_data['data']['User']
+
+    async def medialist_collection_by_name(self, username="", mediatype="ANIME", listname="Completed"):
+        query = medialist_queries['medialist_collection_by_name']['query']
+        variables = medialist_queries['medialist_collection_by_name']['variables']
+        variables['userName'] = username
+        variables['type'] = mediatype
+
+        json_data = await self.post_request(query=query, variables=variables)
+        for _list in json_data['data']['MediaListCollection']['lists']:
+            if _list['name'] == listname:
+                return _list['entries']
+        return json_data['data']['MediaListCollection']['lists'][0]['entries']

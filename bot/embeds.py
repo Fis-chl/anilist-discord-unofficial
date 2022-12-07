@@ -10,8 +10,9 @@ import discord
 
 
 class EmbedHandler:
-    def __init__(self, avatar_url):
+    def __init__(self, avatar_url, user_list_handler):
         self.avatar_url = avatar_url
+        self.user_list_handler = user_list_handler
 
     async def anime_embed(self, data):
         emb = discord.embeds.Embed(
@@ -107,3 +108,24 @@ class EmbedHandler:
         emb.set_thumbnail(url=data['avatar']['large'])
         emb.set_footer(text="AniList Unofficial", icon_url=self.avatar_url)
         return emb
+
+    async def user_medialist_embed(self, user_list_id):
+        user_list = await self.user_list_handler.get_list(user_list_id)
+        if user_list is not None:
+            emb = discord.embeds.Embed(
+                title=f"{user_list.username}'s list",
+                description=f"({user_list.listname} {user_list.mediatype.lower()}, page 1 of {int(len(user_list.entries)/10)})",
+                colour=0xFFAA55
+            )
+            # Build string of anime and stuff
+            media_str = ""
+            for entry in user_list.entries[:10]:
+                print(entry)
+                media = entry['media']
+                media_str = media_str + f"{entry['index']}: **{media['title']['romaji']}** - {entry['status'].lower()} at x/x episodes - scored **{entry['score']}/10**\n"
+            emb.add_field(name="List Details", value=media_str)
+            emb.set_footer(text=f"{user_list_id}   |   AniList Unofficial", icon_url=self.avatar_url)
+            return emb
+        else:
+            return None
+
