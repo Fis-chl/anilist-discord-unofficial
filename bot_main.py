@@ -20,6 +20,7 @@ load_dotenv()
 # Create a bot
 intents = discord.Intents.default()
 intents.messages = True
+intents.reactions = True
 bot = dbot.Bot(command_prefix="-", intents=intents)
 
 
@@ -28,12 +29,33 @@ async def valid_data(data):
     return 'errors' not in data
 
 
-# Functions tagged with @bot
+# Events
 @bot.event
 async def on_ready():
     await anilist.create_session()  # Initialise an aiohttp session for the AniList request handler
     embeds.avatar_url = bot.user.avatar_url
     print(f'Logged in as {bot.user}')
+
+
+@bot.event
+async def on_reaction_add(reaction, user):
+    if user != bot.user:
+        embed = reaction.message.embeds[0]
+        emote = reaction.emoji
+        direction = "f"
+        if emote == '◀':
+            # Go back in the list
+            direction = "b"
+        elif emote == '▶':
+            # Go forward in the list
+            direction = "f"
+        else:
+            return
+        await reaction.message.remove_reaction(emote, user)
+        user_list_id, page = await user_list_handler.get_new_page(embed, direction)
+        if user_list_id is not None and page is not None:
+            embed = await embeds.user_medialist_embed(user_list_id, list_page=page)
+            await reaction.message.edit(embed=embed)
 
 
 # Commands
@@ -88,8 +110,13 @@ async def user_list(ctx, username, listname="Completed", mediatype="ANIME"):
     if await valid_data(data):
         user_list_id = await user_list_handler.create_list(data, username, mediatype, listname)
         embed = await embeds.user_medialist_embed(user_list_id)
-        await send_message(ctx.channel, embed=embed)
-    print(data)
+        message = await send_message(ctx.channel, embed=embed)
+        # Check that the list has enough entries for multiple pages
+        ul = await user_list_handler.get_list(user_list_id)
+        if len(ul.entries) > 10:
+            react_with = ['◀', '▶']
+            for reaction in react_with:
+                await message.add_reaction(reaction)
 
 # End Commands
 
@@ -100,7 +127,7 @@ async def send_message(channel, **kwargs):
         embed = kwargs['embed']
     if 'content' in kwargs:
         content = kwargs['content']
-    await channel.send(content=content, embed=embed)
+    return await channel.send(content=content, embed=embed)
 
 
 user_list_handler = UserListHandler()

@@ -109,20 +109,31 @@ class EmbedHandler:
         emb.set_footer(text="AniList Unofficial", icon_url=self.avatar_url)
         return emb
 
-    async def user_medialist_embed(self, user_list_id):
+    async def user_medialist_embed(self, user_list_id, list_page=1):
+        # Passing in a list_page should change the entries generated.
         user_list = await self.user_list_handler.get_list(user_list_id)
         if user_list is not None:
             emb = discord.embeds.Embed(
                 title=f"{user_list.username}'s list",
-                description=f"({user_list.listname} {user_list.mediatype.lower()}, page 1 of {int(len(user_list.entries)/10)})",
+                description=f"({user_list.listname} {user_list.mediatype.lower()}, page {list_page} of {int((len(user_list.entries) - 1)/10) + 1})",
                 colour=0xFFAA55
             )
             # Build string of anime and stuff
             media_str = ""
-            for entry in user_list.entries[:10]:
-                print(entry)
+            # Get where the list should start
+            list_start = (list_page - 1) * 10
+            if list_start > len(user_list.entries):
+                # Default to the first page of entries if an invalid list_page is passed
+                list_start = 0
+            # 10 entries per page
+            list_end = list_start + 10
+            # Adjust list end if we're on the last page of entries
+            if list_end > len(user_list.entries):
+                list_end = len(user_list.entries)
+            # Build the string!
+            for entry in user_list.entries[list_start: list_end]:
                 media = entry['media']
-                media_str = media_str + f"{entry['index']}: **{media['title']['romaji']}** - {entry['status'].lower()} at x/x episodes - scored **{entry['score']}/10**\n"
+                media_str = media_str + f"{entry['index']}: **{media['title']['romaji']}** - {entry['status'].lower()} *{entry['progress']}/{media['episodes']} episodes* - scored **{entry['score']}/10**\n"
             emb.add_field(name="List Details", value=media_str)
             emb.set_footer(text=f"{user_list_id}   |   AniList Unofficial", icon_url=self.avatar_url)
             return emb

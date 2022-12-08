@@ -66,3 +66,32 @@ class UserListHandler:
         for _list in self.user_list_data:
             if _list.listid == list_id:
                 _list.destroy = True
+
+    async def get_list_from_embed(self, embed):
+        # The list's ID will be in the footer, so extract this and convert it to a UUID
+        footer = embed.footer.text
+        list_id = footer.split(' ')[0]
+        lid = uuid.UUID(list_id)
+        user_list = await self.get_list(lid)
+        return user_list
+
+    async def get_new_page(self, embed, direction="f"):
+        # Get the list id, and the page number, then return the id of the list and the new page to update to
+        user_list = await self.get_list_from_embed(embed)
+        if user_list is not None:
+            description = embed.description.split(',')[1].split(' ')
+            max_page = int(description[-1].split(')')[0])
+            page = int(description[2])
+            if direction != "f":
+                page = page - 1
+            else:
+                page = page + 1
+            if page < 1:
+                page = max_page
+            elif page > max_page:
+                page = 1
+            return user_list.listid, page
+        else:
+            return None, None
+
+
