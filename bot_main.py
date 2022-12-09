@@ -107,8 +107,9 @@ async def user_list(ctx, username, listname="Completed", mediatype="ANIME"):
     if not (mediatype == "ANIME" or mediatype == "MANGA"):
         mediatype = "ANIME"
     data = await anilist.medialist_collection_by_name(username=username, listname=listname, mediatype=mediatype)
+    avatar_url = await anilist.user_avatar_by_name(username=username)
     if await valid_data(data):
-        user_list_id = await user_list_handler.create_list(data, username, mediatype, listname)
+        user_list_id = await user_list_handler.create_list(data, username, mediatype, listname, avatar_url)
         embed = await embeds.user_medialist_embed(user_list_id)
         message = await send_message(ctx.channel, embed=embed)
         # Check that the list has enough entries for multiple pages

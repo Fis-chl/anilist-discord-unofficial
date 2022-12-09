@@ -81,6 +81,14 @@ class AniListRequestHandler:
         json_data = await self.post_request(query=query, variables=variables)
         return json_data['data']['User']
 
+    async def user_avatar_by_name(self, username=""):
+        query = user_queries['user_by_name']['query']
+        variables = user_queries['user_by_name']['variables']
+        variables['search'] = username
+
+        json_data = await self.post_request(query=query, variables=variables)
+        return json_data['data']['User']['avatar']['large']
+
     async def medialist_collection_by_name(self, username="", mediatype="ANIME", listname="Completed"):
         query = medialist_queries['medialist_collection_by_name']['query']
         variables = medialist_queries['medialist_collection_by_name']['variables']

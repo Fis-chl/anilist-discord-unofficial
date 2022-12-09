@@ -12,12 +12,13 @@ import uuid
 
 
 class UserListData:
-    def __init__(self, username, mediatype, listname, entries):
+    def __init__(self, username, mediatype, listname, entries, avatar_url):
         self.listid = uuid.uuid4()
         self.username = username
         self.mediatype = mediatype
         self.listname = listname
         self.entries = entries
+        self.avatar_url = avatar_url
         self.destroy = False
 
 
@@ -50,7 +51,7 @@ class UserListHandler:
         else:
             self.user_list_data.append(userlistdata)
 
-    async def create_list(self, data, username, mediatype, listname):
+    async def create_list(self, data, username, mediatype, listname, avatar_url):
         # Data is a list of media, so:
         entries = []
         counter = 1
@@ -58,7 +59,7 @@ class UserListHandler:
             media['index'] = counter
             entries.append(media)
             counter = counter + 1
-        user_list_data = UserListData(username, mediatype, listname, entries)
+        user_list_data = UserListData(username, mediatype, listname, entries, avatar_url)
         await self.add_list(user_list_data)
         return user_list_data.listid
 

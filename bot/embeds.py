@@ -118,6 +118,7 @@ class EmbedHandler:
                 description=f"({user_list.listname} {user_list.mediatype.lower()}, page {list_page} of {int((len(user_list.entries) - 1)/10) + 1})",
                 colour=0xFFAA55
             )
+            emb.set_thumbnail(url=user_list.avatar_url)
             # Build string of anime and stuff
             media_str = ""
             # Get where the list should start

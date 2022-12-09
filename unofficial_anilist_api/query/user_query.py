@@ -49,4 +49,19 @@ user_queries = {
             'variables':
                 {'search': ""}
         },
+    'user_by_name_profile_picture':
+        {
+            'query': """
+        query ($search: String) {
+            User (search: $search) {
+                avatar {
+                    medium
+                    large
+                }
+            }
+        }
+        """,
+            'variables':
+                {'search': ""}
+        },
 }
